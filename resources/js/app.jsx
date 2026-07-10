@@ -19,6 +19,7 @@ import {
 } from "recharts";
 import {
     Activity,
+    ArrowLeft,
     BarChart3,
     Bell,
     Bot,
@@ -465,9 +466,9 @@ function LandingPage({ onLogin, onRegister }) {
                     <button onClick={onLogin} className="landing-link">
                         Entrar
                     </button>
-                    <button onClick={onRegister} className="landing-action">
+                    <a href="#pricing" id="landing-action">
                         Conhecer planos
-                    </button>
+                    </a>
                 </div>
             </header>
             <section className="landing-hero">
@@ -564,7 +565,7 @@ function LandingPage({ onLogin, onRegister }) {
                 </div>
             </section>
             <section id="pricing" className="landing-section">
-                <span className="eyebrow">Precos</span>
+                <span className="eyebrow">Preços</span>
                 <h2>Planos simples e transparentes</h2>
                 <div className="pricing-grid">
                     {prices.map((p, i) => (
@@ -635,7 +636,9 @@ function LandingPage({ onLogin, onRegister }) {
                     centralizar o seu negocio.
                 </p>
                 <button onClick={onRegister}>Criar conta</button>
-                <button onClick={onLogin}>Conhecer planos</button>
+                <a href="#pricing" id="link-btn">
+                    Conhecer planos
+                </a>
             </section>
             <footer className="landing-footer">
                 <span>2026 OnBoarding</span>
@@ -710,10 +713,12 @@ function AuthScreen({
                 <form onSubmit={submit} className="auth-form auth-form-pro">
                     <button
                         type="button"
-                        className="link back-link"
+                        className="link back-link icon-back-link"
                         onClick={onBack}
+                        aria-label="Voltar"
+                        title="Voltar"
                     >
-                        Voltar
+                        <ArrowLeft size={18} />
                     </button>
                     <div className="auth-card-head">
                         <span>
