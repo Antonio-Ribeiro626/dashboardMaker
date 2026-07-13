@@ -14,7 +14,10 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\Rule;
 
@@ -53,6 +56,74 @@ class OnBoardingController extends Controller
         return ['token' => $user->createToken('onboarding')->plainTextToken, 'user' => $user->load('company')];
     }
 
+
+    public function externalAuth(Request $request, string $provider)
+    {
+        abort_unless(in_array($provider, ['google', 'microsoft', 'sso'], true), 404);
+        $envKey = match ($provider) {
+            'google' => 'GOOGLE_OAUTH_URL',
+            'microsoft' => 'MICROSOFT_OAUTH_URL',
+            'sso' => 'SSO_LOGIN_URL',
+        };
+        $redirectUrl = config("services.$provider.redirect_url") ?: env($envKey);
+        if (!$redirectUrl) {
+            return response()->json([
+                'message' => 'Este metodo de autenticacao ainda nao esta configurado no servidor.',
+                'provider' => $provider,
+                'required_env' => $envKey,
+            ], 422);
+        }
+        return ['redirect_url' => $redirectUrl];
+    }
+
+    public function requestPasswordOtp(Request $request)
+    {
+        $data = $request->validate(['email' => ['required','email']]);
+        $user = User::where('email', $data['email'])->first();
+        if (!$user) {
+            return ['message' => 'Se o email existir, sera enviado um codigo OTP.'];
+        }
+        $otp = (string) random_int(100000, 999999);
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $data['email']],
+            ['token' => Hash::make($otp), 'created_at' => now()]
+        );
+        try {
+            Mail::raw("O seu codigo OTP OnBoarding e: $otp\n\nEste codigo expira em 10 minutos.", function ($message) use ($data) {
+                $message->to($data['email'])->subject('Codigo OTP para recuperar password');
+            });
+        } catch (\Throwable $e) {
+            Log::warning('Falha ao enviar OTP de recuperacao.', ['email' => $data['email'], 'error' => $e->getMessage()]);
+        }
+        return ['message' => 'Se o email existir, sera enviado um codigo OTP.'];
+    }
+
+    public function verifyPasswordOtp(Request $request)
+    {
+        $data = $request->validate(['email' => ['required','email'], 'otp' => ['required','digits:6']]);
+        $record = DB::table('password_reset_tokens')->where('email', $data['email'])->first();
+        if (!$record || now()->diffInMinutes(Carbon::parse($record->created_at)) > 10 || !Hash::check($data['otp'], $record->token)) {
+            return response()->json(['message' => 'Codigo OTP invalido ou expirado.'], 422);
+        }
+        return ['message' => 'Codigo confirmado.'];
+    }
+
+    public function resetPasswordWithOtp(Request $request)
+    {
+        $data = $request->validate([
+            'email' => ['required','email'],
+            'otp' => ['required','digits:6'],
+            'password' => ['required','min:6','confirmed'],
+        ]);
+        $record = DB::table('password_reset_tokens')->where('email', $data['email'])->first();
+        if (!$record || now()->diffInMinutes(Carbon::parse($record->created_at)) > 10 || !Hash::check($data['otp'], $record->token)) {
+            return response()->json(['message' => 'Codigo OTP invalido ou expirado.'], 422);
+        }
+        $user = User::where('email', $data['email'])->firstOrFail();
+        $user->update(['password' => $data['password']]);
+        DB::table('password_reset_tokens')->where('email', $data['email'])->delete();
+        return ['message' => 'Password atualizada. Pode iniciar sessao.'];
+    }
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()?->delete();
@@ -137,19 +208,101 @@ class OnBoardingController extends Controller
     {
         $this->authorizeWrite($request);
         $data = $request->validate(['type' => ['required', Rule::in(['customers','products','sales','expenses'])], 'file' => ['required','file','mimes:csv,txt']]);
-        $rows = array_map('str_getcsv', file($data['file']->getRealPath()));
-        $header = array_map(fn ($h) => trim(strtolower($h)), array_shift($rows));
+        $content = file_get_contents($data['file']->getRealPath());
+        $delimiter = substr_count((string) strtok($content, "\n"), ';') > substr_count((string) strtok($content, "\n"), ',') ? ';' : ',';
+        $rows = array_map(fn ($line) => str_getcsv($line, $delimiter), preg_split('/\r\n|\r|\n/', trim((string) $content)) ?: []);
+        $header = array_map(fn ($h) => $this->normalizeCsvHeader($h), array_shift($rows) ?: []);
+        abort_if(empty($header), 422, 'O CSV nao tem cabecalho.');
+
         $created = 0;
-        foreach ($rows as $row) {
-            $payload = array_combine($header, $row);
-            if (!$payload) continue;
-            $payload['company_id'] = $request->user()->company_id;
-            $this->model($data['type'])::create($payload);
-            $created++;
+        $skipped = 0;
+        $errors = [];
+        foreach ($rows as $index => $row) {
+            if (!array_filter($row, fn ($value) => trim((string) $value) !== '')) continue;
+            if (count($row) !== count($header)) {
+                $skipped++;
+                $errors[] = 'Linha '.($index + 2).': numero de colunas diferente do cabecalho.';
+                continue;
+            }
+            $raw = array_combine($header, $row);
+            try {
+                $payload = $this->csvPayload($data['type'], $raw, $request->user()->company_id);
+                $this->model($data['type'])::create($payload);
+                $created++;
+            } catch (\Throwable $e) {
+                $skipped++;
+                $errors[] = 'Linha '.($index + 2).': '.$e->getMessage();
+            }
         }
+        abort_if($created === 0 && $skipped > 0, 422, implode(' ', array_slice($errors, 0, 3)));
         $this->notify($request->user()->company_id, 'Importacao concluida', "$created registos importados com sucesso.", 'success');
         $this->runAutomaticAlerts($request->user()->company_id);
-        return ['message' => 'Importacao concluida.', 'created' => $created];
+        return ['message' => 'Importacao concluida.', 'created' => $created, 'skipped' => $skipped, 'errors' => array_slice($errors, 0, 5)];
+    }
+
+    private function normalizeCsvHeader(string $header): string
+    {
+        $key = str($header)->lower()->ascii()->replaceMatches('/[^a-z0-9]+/', '_')->trim('_')->toString();
+        return [
+            'nome' => 'name', 'nome_cliente' => 'customer_name', 'cliente' => 'customer_name', 'customer' => 'customer_name',
+            'email_cliente' => 'email', 'telefone' => 'phone', 'telemovel' => 'phone', 'estado' => 'status',
+            'produto' => 'product_name', 'nome_produto' => 'product_name', 'product' => 'product_name',
+            'categoria' => 'category', 'preco' => 'price', 'preco_unitario' => 'price', 'stock' => 'stock',
+            'quantidade' => 'quantity', 'qtd' => 'quantity', 'valor' => 'total', 'total_venda' => 'total',
+            'data' => 'sale_date', 'data_venda' => 'sale_date', 'sale_date' => 'sale_date',
+            'despesa' => 'title', 'titulo' => 'title', 'valor_despesa' => 'amount', 'montante' => 'amount', 'data_despesa' => 'expense_date',
+        ][$key] ?? $key;
+    }
+
+    private function csvPayload(string $type, array $row, int $companyId): array
+    {
+        $value = fn (array $keys, mixed $default = null) => collect($keys)->map(fn ($key) => trim((string) ($row[$key] ?? '')))->first(fn ($item) => $item !== '', $default);
+        $number = fn ($raw) => (float) str_replace(',', '.', preg_replace('/[^0-9,.-]/', '', (string) $raw));
+        $date = fn ($raw) => Carbon::parse($raw ?: now())->toDateString();
+
+        return match ($type) {
+            'customers' => [
+                'company_id' => $companyId,
+                'name' => $value(['name','customer_name']) ?: throw new \InvalidArgumentException('nome do cliente em falta'),
+                'email' => $value(['email']),
+                'phone' => $value(['phone']),
+                'status' => $value(['status'], 'active'),
+            ],
+            'products' => [
+                'company_id' => $companyId,
+                'name' => $value(['name','product_name']) ?: throw new \InvalidArgumentException('nome do produto em falta'),
+                'category' => $value(['category'], 'Geral'),
+                'price' => $number($value(['price'], 0)),
+                'stock' => (int) $number($value(['stock'], 0)),
+            ],
+            'expenses' => [
+                'company_id' => $companyId,
+                'title' => $value(['title','name']) ?: throw new \InvalidArgumentException('titulo da despesa em falta'),
+                'category' => $value(['category'], 'Geral'),
+                'amount' => $number($value(['amount','total'], 0)),
+                'expense_date' => $date($value(['expense_date','sale_date','date'], now())),
+            ],
+            'sales' => $this->csvSalePayload($row, $companyId, $value, $number, $date),
+        };
+    }
+
+    private function csvSalePayload(array $row, int $companyId, callable $value, callable $number, callable $date): array
+    {
+        $customerId = $value(['customer_id']);
+        $productId = $value(['product_id']);
+        if (!$customerId && $customer = $value(['customer_name','name'])) {
+            $customerId = Customer::firstOrCreate(['company_id' => $companyId, 'name' => $customer], ['status' => 'active'])->id;
+        }
+        if (!$productId && $product = $value(['product_name'])) {
+            $productId = Product::firstOrCreate(['company_id' => $companyId, 'name' => $product], ['category' => 'Geral', 'price' => 0, 'stock' => 0])->id;
+        }
+        $quantity = max(1, (int) $number($value(['quantity'], 1)));
+        $total = $number($value(['total','amount'], 0));
+        if ($total <= 0 && $productId) {
+            $total = (float) Product::where('company_id', $companyId)->find($productId)?->price * $quantity;
+        }
+        if ($total <= 0) throw new \InvalidArgumentException('total da venda em falta');
+        return ['company_id' => $companyId, 'customer_id' => $customerId ?: null, 'product_id' => $productId ?: null, 'quantity' => $quantity, 'total' => $total, 'sale_date' => $date($value(['sale_date','date'], now())), 'status' => $value(['status'], 'paid')];
     }
 
     public function exportCsv(Request $request, string $type)

@@ -5,6 +5,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [OnBoardingController::class, 'login']);
 Route::post('/register', [OnBoardingController::class, 'register']);
+Route::post('/auth/{provider}', [OnBoardingController::class, 'externalAuth']);
+Route::post('/password/otp', [OnBoardingController::class, 'requestPasswordOtp']);
+Route::post('/password/otp/verify', [OnBoardingController::class, 'verifyPasswordOtp']);
+Route::post('/password/reset', [OnBoardingController::class, 'resetPasswordWithOtp']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [OnBoardingController::class, 'user']);
