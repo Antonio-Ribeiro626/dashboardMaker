@@ -399,6 +399,7 @@ select {
 }
 
 .card {
+    margin-block: 1rem;
     background: var(--panel);
     border: 1px solid var(--line);
     border-radius: 14px;

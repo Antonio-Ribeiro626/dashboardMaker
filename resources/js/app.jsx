@@ -1356,7 +1356,7 @@ function AuthScreen({
                                                 startExternalAuth("microsoft")
                                             }
                                         >
-                                            <b className="ms-mark">â– </b>{" "}
+                                            <b className="ms-mark"> </b>{" "}
                                             Microsoft
                                         </button>
                                     </div>
@@ -2690,7 +2690,7 @@ function Integrations() {
                     <Plug size={22} />
                 </div>
                 <div>
-                    <h2>Precisa de uma integracao personalizada?</h2>
+                    <h2>Precisa de uma Integração personalizada?</h2>
                     <p>
                         A nossa equipa pode criar conectores para qualquer
                         sistema interno.
