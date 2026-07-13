@@ -254,7 +254,7 @@ function FilterBar({ right }) {
                     <ChevronRight size={14} />
                 </button>
                 <button>
-                    <MapPin size={15} /> Todas as regioes{" "}
+                    <MapPin size={15} /> Todas as regiões{" "}
                     <ChevronRight size={14} />
                 </button>
             </div>
@@ -271,7 +271,7 @@ function DashboardFilters({ filters, setFilters, onReset, categories = [] }) {
         ["year", "Este ano"],
     ];
     const regions = [
-        "Todas as regioes",
+        "Todas as regiões",
         "Norte",
         "Sul",
         "Centro",
@@ -317,9 +317,6 @@ function DashboardFilters({ filters, setFilters, onReset, categories = [] }) {
                                     onClick={() => choose("period", value)}
                                 >
                                     {label}
-                                    <span>
-                                        {filters.period === value ? "OK" : ""}
-                                    </span>
                                 </button>
                             ))}
                         </div>
@@ -350,11 +347,6 @@ function DashboardFilters({ filters, setFilters, onReset, categories = [] }) {
                                     onClick={() => choose("category", value)}
                                 >
                                     {value || "Todas as categorias"}
-                                    <span>
-                                        {(filters.category || "") === value
-                                            ? "OK"
-                                            : ""}
-                                    </span>
                                 </button>
                             ))}
                         </div>
@@ -368,7 +360,7 @@ function DashboardFilters({ filters, setFilters, onReset, categories = [] }) {
                         }
                     >
                         <MapPin size={15} />{" "}
-                        {filters.region || "Todas as regioes"}{" "}
+                        {filters.region || "Todas as regiões"}{" "}
                         <ChevronRight size={14} />
                     </button>
                     {open === "region" && (
@@ -379,19 +371,13 @@ function DashboardFilters({ filters, setFilters, onReset, categories = [] }) {
                                     key={value}
                                     className={
                                         (filters.region ||
-                                            "Todas as regioes") === value
+                                            "Todas as regiões") === value
                                             ? "selected"
                                             : ""
                                     }
                                     onClick={() => choose("region", value)}
                                 >
                                     {value}
-                                    <span>
-                                        {(filters.region ||
-                                            "Todas as regioes") === value
-                                            ? "OK"
-                                            : ""}
-                                    </span>
                                 </button>
                             ))}
                         </div>
@@ -426,7 +412,7 @@ function LandingPage({ onLogin, onRegister }) {
     const features = [
         "Dashboards interativos",
         "Assistente com IA",
-        "Integracoes em 1 clique",
+        "Integrações em 1 clique",
         "Previsoes e tendencias",
         "Seguro por defeito",
         "Alertas inteligentes",
@@ -435,17 +421,17 @@ function LandingPage({ onLogin, onRegister }) {
     const prices = [
         [
             "Iniciante",
-            "29ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬",
+            "29€",
             "Para pequenas equipas a comecar a organizar os seus dados.",
         ],
         [
             "Profissional",
-            "99ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬",
+            "99€",
             "Para PMEs que precisam de analises avancadas e automacao.",
         ],
         [
             "Empresas",
-            "499ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬",
+            "499€",
             "Para empresas que exigem escala, seguranca e personalizacao.",
         ],
     ];
@@ -569,7 +555,7 @@ function LandingPage({ onLogin, onRegister }) {
                 </div>
             </section>
             <section id="pricing" className="landing-section">
-                <span className="eyebrow">PreÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§os</span>
+                <span className="eyebrow">Preço</span>
                 <h2>Planos simples e transparentes</h2>
                 <div className="pricing-grid">
                     {prices.map((p, i) => (
@@ -622,7 +608,7 @@ function LandingPage({ onLogin, onRegister }) {
                     "Preciso de cartao de credito para comecar?",
                     "Os meus dados estao seguros?",
                     "Posso cancelar quando quiser?",
-                    "Que integracoes estao disponiveis?",
+                    "Que Integrações estao disponiveis?",
                 ].map((q) => (
                     <details key={q}>
                         <summary>{q}</summary>
@@ -683,45 +669,75 @@ function AuthScreen({
         country: "Portugal",
         company_size: "",
     });
-    const [resetForm, setResetForm] = useState({ otp: "", password: "", password_confirmation: "" });
+    const [resetForm, setResetForm] = useState({
+        otp: "",
+        password: "",
+        password_confirmation: "",
+    });
     const [error, setError] = useState("");
     const passwordScore = useMemo(() => {
         const p = form.password || "";
         if (!p) return 0;
         let score = 1;
         if (p.length >= 8) score = 2;
-        if (p.length >= 8 && /[A-Z]/.test(p) && /[a-z]/.test(p) && /\d/.test(p)) score = 3;
-        if (p.length >= 10 && /[A-Z]/.test(p) && /[a-z]/.test(p) && /\d/.test(p) && /[^A-Za-z0-9]/.test(p)) score = 4;
+        if (p.length >= 8 && /[A-Z]/.test(p) && /[a-z]/.test(p) && /\d/.test(p))
+            score = 3;
+        if (
+            p.length >= 10 &&
+            /[A-Z]/.test(p) &&
+            /[a-z]/.test(p) &&
+            /\d/.test(p) &&
+            /[^A-Za-z0-9]/.test(p)
+        )
+            score = 4;
         return score;
     }, [form.password]);
-    const strengthClass = ["", "weak", "fair", "medium", "strong"][passwordScore] || "";
+    const strengthClass =
+        ["", "weak", "fair", "medium", "strong"][passwordScore] || "";
     const submit = async (e) => {
         e.preventDefault();
         setError("");
         setMessage("");
         if (mode === "register" && registerStep < 3) {
-            if (registerStep === 1 && (!form.name || !form.email || !form.password)) {
-                setError("Preencha nome, email e palavra-passe para continuar.");
+            if (
+                registerStep === 1 &&
+                (!form.name || !form.email || !form.password)
+            ) {
+                setError(
+                    "Preencha nome, email e palavra-passe para continuar.",
+                );
                 return;
             }
-            if (registerStep === 2 && (!form.company_name || !form.industry || !form.company_size)) {
-                setError("Preencha os dados principais da empresa para continuar.");
+            if (
+                registerStep === 2 &&
+                (!form.company_name || !form.industry || !form.company_size)
+            ) {
+                setError(
+                    "Preencha os dados principais da empresa para continuar.",
+                );
                 return;
             }
             setRegisterStep(registerStep + 1);
             return;
         }
         if (mode === "register" && !acceptedTerms) {
-            setError("Tem de aceitar os Termos de Servico e a Politica de Privacidade.");
+            setError(
+                "Tem de aceitar os Termos de Servico e a Politica de Privacidade.",
+            );
             return;
         }
         try {
             const payload = { ...form };
             if (!payload.employees_count) delete payload.employees_count;
-            const { data } = await api.post(mode === "login" ? "/login" : "/register", payload);
+            const { data } = await api.post(
+                mode === "login" ? "/login" : "/register",
+                payload,
+            );
             onAuth(data);
         } catch (err) {
-            setError(err.response?.data?.message || "Nao foi possivel autenticar.");
+            setError(
+                err.response?.data?.message || "Nao foi possivel autenticar.",
+            );
         }
     };
     const startExternalAuth = async (provider) => {
@@ -731,7 +747,10 @@ function AuthScreen({
             const { data } = await api.post(`/auth/${provider}`);
             window.location.href = data.redirect_url;
         } catch (err) {
-            setError(err.response?.data?.message || "Metodo de autenticacao indisponivel.");
+            setError(
+                err.response?.data?.message ||
+                    "Metodo de autenticacao indisponivel.",
+            );
         }
     };
     const requestOtp = async (e) => {
@@ -739,11 +758,16 @@ function AuthScreen({
         setError("");
         setMessage("");
         try {
-            const { data } = await api.post("/password/otp", { email: form.email });
+            const { data } = await api.post("/password/otp", {
+                email: form.email,
+            });
             setMessage(data.message);
             setResetStep("otp");
         } catch (err) {
-            setError(err.response?.data?.message || "Nao foi possivel enviar o codigo.");
+            setError(
+                err.response?.data?.message ||
+                    "Nao foi possivel enviar o codigo.",
+            );
         }
     };
     const verifyOtp = async (e) => {
@@ -751,7 +775,10 @@ function AuthScreen({
         setError("");
         setMessage("");
         try {
-            const { data } = await api.post("/password/otp/verify", { email: form.email, otp: resetForm.otp });
+            const { data } = await api.post("/password/otp/verify", {
+                email: form.email,
+                otp: resetForm.otp,
+            });
             setMessage(data.message);
             setResetStep("reset");
         } catch (err) {
@@ -763,14 +790,22 @@ function AuthScreen({
         setError("");
         setMessage("");
         try {
-            const { data } = await api.post("/password/reset", { email: form.email, otp: resetForm.otp, password: resetForm.password, password_confirmation: resetForm.password_confirmation });
+            const { data } = await api.post("/password/reset", {
+                email: form.email,
+                otp: resetForm.otp,
+                password: resetForm.password,
+                password_confirmation: resetForm.password_confirmation,
+            });
             setMessage(data.message);
             setResetStep("auth");
             setMode("login");
             setForm({ ...form, password: "" });
             setResetForm({ otp: "", password: "", password_confirmation: "" });
         } catch (err) {
-            setError(err.response?.data?.message || "Nao foi possivel atualizar a password.");
+            setError(
+                err.response?.data?.message ||
+                    "Nao foi possivel atualizar a password.",
+            );
         }
     };
     const splitName = form.name.trim().split(/\s+/);
@@ -782,48 +817,740 @@ function AuthScreen({
         setForm({ ...form, name: `${nextFirst} ${nextLast}`.trim() });
     };
     const setCompanySize = (size) => {
-        const count = size === "1-10" ? 10 : size === "11-50" ? 50 : size === "51-200" ? 200 : 201;
-        setForm({ ...form, company_size: size, employees_count: String(count) });
+        const count =
+            size === "1-10"
+                ? 10
+                : size === "11-50"
+                  ? 50
+                  : size === "51-200"
+                    ? 200
+                    : 201;
+        setForm({
+            ...form,
+            company_size: size,
+            employees_count: String(count),
+        });
     };
-    const visual = mode === "login"
-        ? { title: "Todos os insights de que a sua equipa precisa, numa interface calma.", text: "Centralize dados de qualquer fonte. Construa dashboards em minutos. Receba respostas com IA para as perguntas que fazem o seu negocio crescer." }
-        : { title: "Comece gratis. Sem cartao. Sem complicacoes.", text: "14 dias de acesso completo a plataforma. Ligue as suas fontes de dados e tenha o primeiro dashboard pronto em menos de 10 minutos." };
-    const resetTitle = resetStep === "forgot" ? "Recuperar password" : resetStep === "otp" ? "Confirmar codigo OTP" : "Criar nova password";
-    const resetText = resetStep === "forgot" ? "Indique o email da conta para enviarmos um codigo OTP." : resetStep === "otp" ? "Insira o codigo de 6 digitos enviado para o seu email." : "Defina uma password nova para voltar a entrar.";
-    const steps = [[1, "Conta", User], [2, "Empresa", Building2], [3, "Confirmar", Check]];
+    const visual =
+        mode === "login"
+            ? {
+                  title: "Todos os insights de que a sua equipa precisa, numa interface calma.",
+                  text: "Centralize dados de qualquer fonte. Construa dashboards em minutos. Receba respostas com IA para as perguntas que fazem o seu negocio crescer.",
+              }
+            : {
+                  title: "Comece gratis. Sem cartao. Sem complicacoes.",
+                  text: "14 dias de acesso completo a plataforma. Ligue as suas fontes de dados e tenha o primeiro dashboard pronto em menos de 10 minutos.",
+              };
+    const resetTitle =
+        resetStep === "forgot"
+            ? "Recuperar password"
+            : resetStep === "otp"
+              ? "Confirmar codigo OTP"
+              : "Criar nova password";
+    const resetText =
+        resetStep === "forgot"
+            ? "Indique o email da conta para enviarmos um codigo OTP."
+            : resetStep === "otp"
+              ? "Insira o codigo de 6 digitos enviado para o seu email."
+              : "Defina uma password nova para voltar a entrar.";
+    const steps = [
+        [1, "Conta", User],
+        [2, "Empresa", Building2],
+        [3, "Confirmar", Check],
+    ];
     return (
         <main className="auth-split-shell">
             <section className="auth-workspace">
                 <div className="auth-workspace-inner">
-                    <div className="auth-logo-row"><div className="brand-icon"><Zap size={20} /></div><strong>OnBoarding</strong></div>
+                    <div className="auth-logo-row">
+                        <div className="brand-icon">
+                            <Zap size={20} />
+                        </div>
+                        <strong>OnBoarding</strong>
+                    </div>
                     {resetStep !== "auth" ? (
-                        <form onSubmit={resetStep === "forgot" ? requestOtp : resetStep === "otp" ? verifyOtp : resetPassword} className="auth-modern-form reset-auth-form">
-                            <button type="button" className="link icon-back-link" onClick={() => { setResetStep("auth"); setError(""); setMessage(""); }} aria-label="Voltar"><ArrowLeft size={18}/></button>
-                            <div className="auth-title-block login-title"><h1>{resetTitle}</h1><p>{resetText}</p></div>
-                            {resetStep === "forgot" && <label>Email profissional<div className="auth-input-icon"><Mail size={17}/><Input type="email" placeholder="voce@empresa.com" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}/></div></label>}
-                            {resetStep === "otp" && <label>Codigo OTP<div className="auth-input-icon"><Lock size={17}/><Input inputMode="numeric" maxLength="6" placeholder="000000" value={resetForm.otp} onChange={(e) => setResetForm({ ...resetForm, otp: e.target.value.replace(/\D/g, "").slice(0, 6) })}/></div></label>}
-                            {resetStep === "reset" && <><label>Nova password<div className="auth-input-icon"><Lock size={17}/><Input type="password" placeholder="Nova password" value={resetForm.password} onChange={(e) => setResetForm({ ...resetForm, password: e.target.value })}/></div></label><label>Confirmar password<div className="auth-input-icon"><Lock size={17}/><Input type="password" placeholder="Confirmar password" value={resetForm.password_confirmation} onChange={(e) => setResetForm({ ...resetForm, password_confirmation: e.target.value })}/></div></label></>}
-                            {error && <p className="alert error">{error}</p>}{message && <p className="alert">{message}</p>}
-                            <Button className="w-full auth-main-action">{resetStep === "forgot" ? "Enviar codigo OTP" : resetStep === "otp" ? "Confirmar codigo" : "Atualizar password"}</Button>
+                        <form
+                            onSubmit={
+                                resetStep === "forgot"
+                                    ? requestOtp
+                                    : resetStep === "otp"
+                                      ? verifyOtp
+                                      : resetPassword
+                            }
+                            className="auth-modern-form reset-auth-form"
+                        >
+                            <button
+                                type="button"
+                                className="link icon-back-link"
+                                onClick={() => {
+                                    setResetStep("auth");
+                                    setError("");
+                                    setMessage("");
+                                }}
+                                aria-label="Voltar"
+                            >
+                                <ArrowLeft size={18} />
+                            </button>
+                            <div className="auth-title-block login-title">
+                                <h1>{resetTitle}</h1>
+                                <p>{resetText}</p>
+                            </div>
+                            {resetStep === "forgot" && (
+                                <label>
+                                    Email profissional
+                                    <div className="auth-input-icon">
+                                        <Mail size={17} />
+                                        <Input
+                                            type="email"
+                                            placeholder="voce@empresa.com"
+                                            value={form.email}
+                                            onChange={(e) =>
+                                                setForm({
+                                                    ...form,
+                                                    email: e.target.value,
+                                                })
+                                            }
+                                        />
+                                    </div>
+                                </label>
+                            )}
+                            {resetStep === "otp" && (
+                                <label>
+                                    Codigo OTP
+                                    <div className="auth-input-icon">
+                                        <Lock size={17} />
+                                        <Input
+                                            inputMode="numeric"
+                                            maxLength="6"
+                                            placeholder="000000"
+                                            value={resetForm.otp}
+                                            onChange={(e) =>
+                                                setResetForm({
+                                                    ...resetForm,
+                                                    otp: e.target.value
+                                                        .replace(/\D/g, "")
+                                                        .slice(0, 6),
+                                                })
+                                            }
+                                        />
+                                    </div>
+                                </label>
+                            )}
+                            {resetStep === "reset" && (
+                                <>
+                                    <label>
+                                        Nova password
+                                        <div className="auth-input-icon">
+                                            <Lock size={17} />
+                                            <Input
+                                                type="password"
+                                                placeholder="Nova password"
+                                                value={resetForm.password}
+                                                onChange={(e) =>
+                                                    setResetForm({
+                                                        ...resetForm,
+                                                        password:
+                                                            e.target.value,
+                                                    })
+                                                }
+                                            />
+                                        </div>
+                                    </label>
+                                    <label>
+                                        Confirmar password
+                                        <div className="auth-input-icon">
+                                            <Lock size={17} />
+                                            <Input
+                                                type="password"
+                                                placeholder="Confirmar password"
+                                                value={
+                                                    resetForm.password_confirmation
+                                                }
+                                                onChange={(e) =>
+                                                    setResetForm({
+                                                        ...resetForm,
+                                                        password_confirmation:
+                                                            e.target.value,
+                                                    })
+                                                }
+                                            />
+                                        </div>
+                                    </label>
+                                </>
+                            )}
+                            {error && <p className="alert error">{error}</p>}
+                            {message && <p className="alert">{message}</p>}
+                            <Button className="w-full auth-main-action">
+                                {resetStep === "forgot"
+                                    ? "Enviar codigo OTP"
+                                    : resetStep === "otp"
+                                      ? "Confirmar codigo"
+                                      : "Atualizar password"}
+                            </Button>
                         </form>
                     ) : (
-                    <form onSubmit={submit} className="auth-modern-form">
-                        {mode === "register" ? <>
-                            <div className="auth-title-block"><h1>Crie o espaco da sua empresa</h1><p>Comece o teste gratis de 14 dias. Sem cartao de credito.</p></div>
-                            <div className="auth-steps auth-steps-clickable" aria-label="Progresso de criacao de conta">{steps.map(([step,label,Icon],i)=><React.Fragment key={label}><span className={`${registerStep===step?'active':''} ${registerStep>step?'done':''}`}><Icon size={16}/> {label}</span>{i<steps.length-1&&<i className={registerStep>step?'done':''}></i>}</React.Fragment>)}</div>
-                            {registerStep === 1 && <><div className="auth-two-cols auth-name-grid"><label>Primeiro nome<Input value={firstName} onChange={(e) => setNamePart("first", e.target.value)}/></label><label>Apelido<Input value={lastName} onChange={(e) => setNamePart("last", e.target.value)}/></label></div><label>Cargo<div className="auth-input-icon"><BriefcaseBusiness size={17}/><Input placeholder="CEO, CFO, Diretor de Operacoes..." value={form.industry} onChange={(e) => setForm({ ...form, industry: e.target.value })}/></div></label><label>Email profissional<div className="auth-input-icon"><Mail size={17}/><Input type="email" placeholder="voce@empresa.com" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}/></div><small>Use o email do dominio da empresa para ligar automaticamente colegas.</small></label><label>Palavra-passe<div className="auth-input-icon password-field"><Lock size={17}/><Input type={showPassword ? "text" : "password"} placeholder="Pelo menos 8 caracteres" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })}/></div><span className={`password-meter meter-${strengthClass}`}>{[0,1,2,3].map((i)=><i key={i} className={passwordScore > i ? "active" : ""}></i>)}</span><small>Use maiusculas, numeros e simbolos para uma palavra-passe forte.</small></label></>}
-                            {registerStep === 2 && <><label>Nome da empresa<div className="auth-input-icon"><Building2 size={17}/><Input placeholder="Acme Lda." value={form.company_name} onChange={(e) => setForm({ ...form, company_name: e.target.value })}/></div></label><div className="auth-two-cols"><label>NIF / VAT<Input placeholder="PT500000000" value={form.vat} onChange={(e) => setForm({ ...form, vat: e.target.value })}/></label><label>PaÃ­s<select className="input" value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })}><option>Portugal</option><option>Angola</option><option>Brasil</option><option>Cabo Verde</option><option>ES</option><option>Outro</option></select></label></div><label>Setor<select className="input" value={form.industry} onChange={(e) => setForm({ ...form, industry: e.target.value })}><option value="">Selecione o setor</option><option>Retalho e e-commerce</option><option>Software / SaaS</option><option>Servicos financeiros</option><option>Industria</option><option>Saude</option><option>Servicos profissionais</option><option>Outro</option></select></label><label>DimensÃ£o da empresa<div className="company-size-grid">{["1-10","11-50","51-200","200+"].map(size=><button type="button" key={size} className={form.company_size===size?'active':''} onClick={()=>setCompanySize(size)}>{size}</button>)}</div></label></>}
-                            {registerStep === 3 && <><section className="confirm-card"><h3>Reveja os detalhes</h3>{[["Nome",form.name],["Email",form.email],["Empresa",form.company_name],["Setor",form.industry],["DimensÃ£o",form.company_size],["PaÃ­s",form.country]].map(([k,v])=><div key={k}><span>{k}</span><strong>{v || '-'}</strong></div>)}</section><section className="plan-card"><h3>Plano Pro Â· 14 dias gratis</h3><p>Acesso total a plataforma. Cancele a qualquer momento. Nao pedimos cartao de credito.</p></section><label className="confirm-check"><input type="checkbox" checked={acceptedTerms} onChange={(e)=>setAcceptedTerms(e.target.checked)}/> Aceito os Termos de Servico e a Politica de Privacidade.</label><label className="confirm-check"><input type="checkbox" checked={marketingOptIn} onChange={(e)=>setMarketingOptIn(e.target.checked)}/> Quero receber dicas de produto e novidades por email (opcional).</label></>}
-                        </> : <><div className="auth-title-block login-title"><h1>Bem-vindo de volta</h1><p>Entre no espaco de trabalho da sua empresa.</p></div><div className="sso-grid"><button type="button" onClick={() => startExternalAuth("google")}><b>G</b> Google</button><button type="button" onClick={() => startExternalAuth("microsoft")}><b className="ms-mark">â– </b> Microsoft</button></div><div className="auth-divider"><span>ou com o seu email de trabalho</span></div><label>Email profissional<div className="auth-input-icon"><Mail size={17}/><Input type="email" placeholder="voce@empresa.com" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}/></div></label><label>Palavra-passe<button type="button" className="forgot-link" onClick={() => { setResetStep("forgot"); setError(""); setMessage(""); }}>Esqueceu-se?</button><div className="auth-input-icon password-field"><Lock size={17}/><Input type={showPassword ? "text" : "password"} placeholder="********" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })}/><button type="button" onClick={() => setShowPassword(!showPassword)}><Eye size={15}/> Ver</button></div></label><label className="remember-row"><input type="checkbox"/> Manter sessao iniciada</label></>}
-                        {error && <p className="alert error">{error}</p>}{message && <p className="alert">{message}</p>}
-                        {mode === "register" && registerStep > 1 ? <div className="wizard-actions"><button type="button" className="wizard-back" onClick={()=>setRegisterStep(registerStep-1)}><ArrowLeft size={16}/> Voltar</button><Button className="w-full auth-main-action">{registerStep === 3 ? "Criar espaco de trabalho" : <>Continuar <ChevronRight size={16}/></>}</Button></div> : <Button className="w-full auth-main-action">{mode === "login" ? "Entrar no espaco de trabalho" : <>Continuar <ChevronRight size={16}/></>}</Button>}
-                        {mode === "login" && <button type="button" className="sso-link" onClick={() => startExternalAuth("sso")}><Building2 size={15}/> Entrar com SSO (SAML/OIDC)</button>}
-                        <button type="button" className="link auth-switch auth-modern-switch" onClick={() => changeMode(mode === "login" ? "register" : "login")}>{mode === "login" ? "Ainda nao tem conta? Criar conta da empresa" : "Ja tem conta? Entrar"}</button>
-                        <div className="trust-row"><span><Shield size={14}/> SOC 2 Type II</span><span><Lock size={14}/> RGPD</span><span><Shield size={14}/> ISO 27001</span></div>
-                    </form>)}
+                        <form onSubmit={submit} className="auth-modern-form">
+                            {mode === "register" ? (
+                                <>
+                                    <div className="auth-title-block">
+                                        <h1>Crie o espaco da sua empresa</h1>
+                                        <p>
+                                            Comece o teste gratis de 14 dias.
+                                            Sem cartao de credito.
+                                        </p>
+                                    </div>
+                                    <div
+                                        className="auth-steps auth-steps-clickable"
+                                        aria-label="Progresso de criacao de conta"
+                                    >
+                                        {steps.map(([step, label, Icon], i) => (
+                                            <React.Fragment key={label}>
+                                                <span
+                                                    className={`${registerStep === step ? "active" : ""} ${registerStep > step ? "done" : ""}`}
+                                                >
+                                                    <Icon size={16} /> {label}
+                                                </span>
+                                                {i < steps.length - 1 && (
+                                                    <i
+                                                        className={
+                                                            registerStep > step
+                                                                ? "done"
+                                                                : ""
+                                                        }
+                                                    ></i>
+                                                )}
+                                            </React.Fragment>
+                                        ))}
+                                    </div>
+                                    {registerStep === 1 && (
+                                        <>
+                                            <div className="auth-two-cols auth-name-grid">
+                                                <label>
+                                                    Primeiro nome
+                                                    <Input
+                                                        value={firstName}
+                                                        onChange={(e) =>
+                                                            setNamePart(
+                                                                "first",
+                                                                e.target.value,
+                                                            )
+                                                        }
+                                                    />
+                                                </label>
+                                                <label>
+                                                    Apelido
+                                                    <Input
+                                                        value={lastName}
+                                                        onChange={(e) =>
+                                                            setNamePart(
+                                                                "last",
+                                                                e.target.value,
+                                                            )
+                                                        }
+                                                    />
+                                                </label>
+                                            </div>
+                                            <label>
+                                                Cargo
+                                                <div className="auth-input-icon">
+                                                    <BriefcaseBusiness
+                                                        size={17}
+                                                    />
+                                                    <Input
+                                                        placeholder="CEO, CFO, Diretor de Operacoes..."
+                                                        value={form.industry}
+                                                        onChange={(e) =>
+                                                            setForm({
+                                                                ...form,
+                                                                industry:
+                                                                    e.target
+                                                                        .value,
+                                                            })
+                                                        }
+                                                    />
+                                                </div>
+                                            </label>
+                                            <label>
+                                                Email profissional
+                                                <div className="auth-input-icon">
+                                                    <Mail size={17} />
+                                                    <Input
+                                                        type="email"
+                                                        placeholder="voce@empresa.com"
+                                                        value={form.email}
+                                                        onChange={(e) =>
+                                                            setForm({
+                                                                ...form,
+                                                                email: e.target
+                                                                    .value,
+                                                            })
+                                                        }
+                                                    />
+                                                </div>
+                                                <small>
+                                                    Use o email do dominio da
+                                                    empresa para ligar
+                                                    automaticamente colegas.
+                                                </small>
+                                            </label>
+                                            <label>
+                                                Palavra-passe
+                                                <div className="auth-input-icon password-field">
+                                                    <Lock size={17} />
+                                                    <Input
+                                                        type={
+                                                            showPassword
+                                                                ? "text"
+                                                                : "password"
+                                                        }
+                                                        placeholder="Pelo menos 8 caracteres"
+                                                        value={form.password}
+                                                        onChange={(e) =>
+                                                            setForm({
+                                                                ...form,
+                                                                password:
+                                                                    e.target
+                                                                        .value,
+                                                            })
+                                                        }
+                                                    />
+                                                </div>
+                                                <span
+                                                    className={`password-meter meter-${strengthClass}`}
+                                                >
+                                                    {[0, 1, 2, 3].map((i) => (
+                                                        <i
+                                                            key={i}
+                                                            className={
+                                                                passwordScore >
+                                                                i
+                                                                    ? "active"
+                                                                    : ""
+                                                            }
+                                                        ></i>
+                                                    ))}
+                                                </span>
+                                                <small>
+                                                    Use maiusculas, numeros e
+                                                    simbolos para uma
+                                                    palavra-passe forte.
+                                                </small>
+                                            </label>
+                                        </>
+                                    )}
+                                    {registerStep === 2 && (
+                                        <>
+                                            <label>
+                                                Nome da empresa
+                                                <div className="auth-input-icon">
+                                                    <Building2 size={17} />
+                                                    <Input
+                                                        placeholder="Acme Lda."
+                                                        value={
+                                                            form.company_name
+                                                        }
+                                                        onChange={(e) =>
+                                                            setForm({
+                                                                ...form,
+                                                                company_name:
+                                                                    e.target
+                                                                        .value,
+                                                            })
+                                                        }
+                                                    />
+                                                </div>
+                                            </label>
+                                            <div className="auth-two-cols">
+                                                <label>
+                                                    NIF / VAT
+                                                    <Input
+                                                        placeholder="PT500000000"
+                                                        value={form.vat}
+                                                        onChange={(e) =>
+                                                            setForm({
+                                                                ...form,
+                                                                vat: e.target
+                                                                    .value,
+                                                            })
+                                                        }
+                                                    />
+                                                </label>
+                                                <label>
+                                                    PaÃ­s
+                                                    <select
+                                                        className="input"
+                                                        value={form.country}
+                                                        onChange={(e) =>
+                                                            setForm({
+                                                                ...form,
+                                                                country:
+                                                                    e.target
+                                                                        .value,
+                                                            })
+                                                        }
+                                                    >
+                                                        <option>
+                                                            Portugal
+                                                        </option>
+                                                        <option>Angola</option>
+                                                        <option>Brasil</option>
+                                                        <option>
+                                                            Cabo Verde
+                                                        </option>
+                                                        <option>ES</option>
+                                                        <option>Outro</option>
+                                                    </select>
+                                                </label>
+                                            </div>
+                                            <label>
+                                                Setor
+                                                <select
+                                                    className="input"
+                                                    value={form.industry}
+                                                    onChange={(e) =>
+                                                        setForm({
+                                                            ...form,
+                                                            industry:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                >
+                                                    <option value="">
+                                                        Selecione o setor
+                                                    </option>
+                                                    <option>
+                                                        Retalho e e-commerce
+                                                    </option>
+                                                    <option>
+                                                        Software / SaaS
+                                                    </option>
+                                                    <option>
+                                                        Servicos financeiros
+                                                    </option>
+                                                    <option>Industria</option>
+                                                    <option>Saude</option>
+                                                    <option>
+                                                        Servicos profissionais
+                                                    </option>
+                                                    <option>Outro</option>
+                                                </select>
+                                            </label>
+                                            <label>
+                                                DimensÃ£o da empresa
+                                                <div className="company-size-grid">
+                                                    {[
+                                                        "1-10",
+                                                        "11-50",
+                                                        "51-200",
+                                                        "200+",
+                                                    ].map((size) => (
+                                                        <button
+                                                            type="button"
+                                                            key={size}
+                                                            className={
+                                                                form.company_size ===
+                                                                size
+                                                                    ? "active"
+                                                                    : ""
+                                                            }
+                                                            onClick={() =>
+                                                                setCompanySize(
+                                                                    size,
+                                                                )
+                                                            }
+                                                        >
+                                                            {size}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </label>
+                                        </>
+                                    )}
+                                    {registerStep === 3 && (
+                                        <>
+                                            <section className="confirm-card">
+                                                <h3>Reveja os detalhes</h3>
+                                                {[
+                                                    ["Nome", form.name],
+                                                    ["Email", form.email],
+                                                    [
+                                                        "Empresa",
+                                                        form.company_name,
+                                                    ],
+                                                    ["Setor", form.industry],
+                                                    [
+                                                        "DimensÃ£o",
+                                                        form.company_size,
+                                                    ],
+                                                    ["PaÃ­s", form.country],
+                                                ].map(([k, v]) => (
+                                                    <div key={k}>
+                                                        <span>{k}</span>
+                                                        <strong>
+                                                            {v || "-"}
+                                                        </strong>
+                                                    </div>
+                                                ))}
+                                            </section>
+                                            <section className="plan-card">
+                                                <h3>
+                                                    Plano Pro Â· 14 dias gratis
+                                                </h3>
+                                                <p>
+                                                    Acesso total a plataforma.
+                                                    Cancele a qualquer momento.
+                                                    Nao pedimos cartao de
+                                                    credito.
+                                                </p>
+                                            </section>
+                                            <label className="confirm-check">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={acceptedTerms}
+                                                    onChange={(e) =>
+                                                        setAcceptedTerms(
+                                                            e.target.checked,
+                                                        )
+                                                    }
+                                                />{" "}
+                                                Aceito os Termos de Servico e a
+                                                Politica de Privacidade.
+                                            </label>
+                                            <label className="confirm-check">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={marketingOptIn}
+                                                    onChange={(e) =>
+                                                        setMarketingOptIn(
+                                                            e.target.checked,
+                                                        )
+                                                    }
+                                                />{" "}
+                                                Quero receber dicas de produto e
+                                                novidades por email (opcional).
+                                            </label>
+                                        </>
+                                    )}
+                                </>
+                            ) : (
+                                <>
+                                    <div className="auth-title-block login-title">
+                                        <h1>Bem-vindo de volta</h1>
+                                        <p>
+                                            Entre no espaco de trabalho da sua
+                                            empresa.
+                                        </p>
+                                    </div>
+                                    <div className="sso-grid">
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                startExternalAuth("google")
+                                            }
+                                        >
+                                            <b>G</b> Google
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                startExternalAuth("microsoft")
+                                            }
+                                        >
+                                            <b className="ms-mark">â– </b>{" "}
+                                            Microsoft
+                                        </button>
+                                    </div>
+                                    <div className="auth-divider">
+                                        <span>
+                                            ou com o seu email de trabalho
+                                        </span>
+                                    </div>
+                                    <label>
+                                        Email profissional
+                                        <div className="auth-input-icon">
+                                            <Mail size={17} />
+                                            <Input
+                                                type="email"
+                                                placeholder="voce@empresa.com"
+                                                value={form.email}
+                                                onChange={(e) =>
+                                                    setForm({
+                                                        ...form,
+                                                        email: e.target.value,
+                                                    })
+                                                }
+                                            />
+                                        </div>
+                                    </label>
+                                    <label>
+                                        Palavra-passe
+                                        <button
+                                            type="button"
+                                            className="forgot-link"
+                                            onClick={() => {
+                                                setResetStep("forgot");
+                                                setError("");
+                                                setMessage("");
+                                            }}
+                                        >
+                                            Esqueceu-se?
+                                        </button>
+                                        <div className="auth-input-icon password-field">
+                                            <Lock size={17} />
+                                            <Input
+                                                type={
+                                                    showPassword
+                                                        ? "text"
+                                                        : "password"
+                                                }
+                                                placeholder="********"
+                                                value={form.password}
+                                                onChange={(e) =>
+                                                    setForm({
+                                                        ...form,
+                                                        password:
+                                                            e.target.value,
+                                                    })
+                                                }
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    setShowPassword(
+                                                        !showPassword,
+                                                    )
+                                                }
+                                            >
+                                                <Eye size={15} /> Ver
+                                            </button>
+                                        </div>
+                                    </label>
+                                    <label className="remember-row">
+                                        <input type="checkbox" /> Manter sessao
+                                        iniciada
+                                    </label>
+                                </>
+                            )}
+                            {error && <p className="alert error">{error}</p>}
+                            {message && <p className="alert">{message}</p>}
+                            {mode === "register" && registerStep > 1 ? (
+                                <div className="wizard-actions">
+                                    <button
+                                        type="button"
+                                        className="wizard-back"
+                                        onClick={() =>
+                                            setRegisterStep(registerStep - 1)
+                                        }
+                                    >
+                                        <ArrowLeft size={16} /> Voltar
+                                    </button>
+                                    <Button className="w-full auth-main-action">
+                                        {registerStep === 3 ? (
+                                            "Criar espaco de trabalho"
+                                        ) : (
+                                            <>
+                                                Continuar{" "}
+                                                <ChevronRight size={16} />
+                                            </>
+                                        )}
+                                    </Button>
+                                </div>
+                            ) : (
+                                <Button className="w-full auth-main-action">
+                                    {mode === "login" ? (
+                                        "Entrar no espaco de trabalho"
+                                    ) : (
+                                        <>
+                                            Continuar <ChevronRight size={16} />
+                                        </>
+                                    )}
+                                </Button>
+                            )}
+                            {mode === "login" && (
+                                <button
+                                    type="button"
+                                    className="sso-link"
+                                    onClick={() => startExternalAuth("sso")}
+                                >
+                                    <Building2 size={15} /> Entrar com SSO
+                                    (SAML/OIDC)
+                                </button>
+                            )}
+                            <button
+                                type="button"
+                                className="link auth-switch auth-modern-switch"
+                                onClick={() =>
+                                    changeMode(
+                                        mode === "login" ? "register" : "login",
+                                    )
+                                }
+                            >
+                                {mode === "login"
+                                    ? "Ainda nao tem conta? Criar conta da empresa"
+                                    : "Ja tem conta? Entrar"}
+                            </button>
+                            <div className="trust-row">
+                                <span>
+                                    <Shield size={14} /> SOC 2 Type II
+                                </span>
+                                <span>
+                                    <Lock size={14} /> RGPD
+                                </span>
+                                <span>
+                                    <Shield size={14} /> ISO 27001
+                                </span>
+                            </div>
+                        </form>
+                    )}
                 </div>
             </section>
-            <section className="auth-gradient-panel"><div><span>BI EMPRESARIAL PARA PMES</span><h2>{visual.title}</h2><p>{visual.text}</p>{mode === "login" ? <><div className="auth-proof-grid"><strong>12M+<small>Dados processados</small></strong><strong>3.200+<small>PMEs</small></strong><strong>99,99%<small>Uptime</small></strong></div><blockquote>"Reduzimos o tempo de reporting de 3 dias para 20 minutos. A equipa financeira nunca mais foi a mesma."<small>Marta Silva - CFO, Norvex Lda.</small></blockquote></> : <div className="gradient-benefits"><span><Sparkles size={18}/> IA que responde as suas perguntas de negocio</span><span><BarChart3 size={18}/> Dashboards ilimitados e partilhaveis</span><span><Users size={18}/> Colaboracao para toda a sua equipa</span><span><Shield size={18}/> Seguranca de nivel empresarial</span></div>}</div></section>
+            <section className="auth-gradient-panel">
+                <div>
+                    <span>BI EMPRESARIAL PARA PMES</span>
+                    <h2>{visual.title}</h2>
+                    <p>{visual.text}</p>
+                    {mode === "login" ? (
+                        <>
+                            <div className="auth-proof-grid">
+                                <strong>
+                                    12M+<small>Dados processados</small>
+                                </strong>
+                                <strong>
+                                    3.200+<small>PMEs</small>
+                                </strong>
+                                <strong>
+                                    99,99%<small>Uptime</small>
+                                </strong>
+                            </div>
+                            <blockquote>
+                                "Reduzimos o tempo de reporting de 3 dias para
+                                20 minutos. A equipa financeira nunca mais foi a
+                                mesma."
+                                <small>Marta Silva - CFO, Norvex Lda.</small>
+                            </blockquote>
+                        </>
+                    ) : (
+                        <div className="gradient-benefits">
+                            <span>
+                                <Sparkles size={18} /> IA que responde as suas
+                                perguntas de negocio
+                            </span>
+                            <span>
+                                <BarChart3 size={18} /> Dashboards ilimitados e
+                                partilhaveis
+                            </span>
+                            <span>
+                                <Users size={18} /> Colaboracao para toda a sua
+                                equipa
+                            </span>
+                            <span>
+                                <Shield size={18} /> Seguranca de nivel
+                                empresarial
+                            </span>
+                        </div>
+                    )}
+                </div>
+            </section>
         </main>
     );
 }
@@ -849,17 +1576,17 @@ function Sidebar({ page, setPage }) {
         [
             "Dados",
             [
-                ["imports", "Importacoes", Upload],
-                ["exports", "Exportacoes", Download],
-                ["integrations", "Integracoes", Plug],
+                ["imports", "Importações", Upload],
+                ["exports", "Exportações", Download],
+                ["integrations", "Integrações", Plug],
             ],
         ],
         [
             "Ferramentas",
             [
                 ["ai", "Assistente IA", Sparkles],
-                ["notifications", "Notificacoes", Bell],
-                ["settings", "Definicoes", Settings],
+                ["notifications", "Notificações", Bell],
+                ["settings", "Definições", Settings],
                 ["profile", "Perfil", User],
             ],
         ],
@@ -942,7 +1669,7 @@ function Navbar({
                 <button
                     className="icon-btn"
                     onClick={() => onNavigate("notifications")}
-                    title="Abrir notificacoes"
+                    title="Abrir notificações"
                 >
                     <Bell />
                     <i></i>
@@ -1072,7 +1799,7 @@ function Dashboard({ setBadge, setPage }) {
     const [filters, setFilters] = useState({
         period: "year",
         category: "",
-        region: "Todas as regioes",
+        region: "Todas as regiões",
     });
     const params = useMemo(() => {
         const now = new Date();
@@ -1141,7 +1868,7 @@ function Dashboard({ setBadge, setPage }) {
                     setFilters({
                         period: "year",
                         category: "",
-                        region: "Todas as regioes",
+                        region: "Todas as regiões",
                     });
                 }}
             />
@@ -1399,7 +2126,7 @@ function ActivityCards({ sales = [], notifications = [] }) {
                 )}
             </section>
             <section className="card task-card">
-                <h3>Notificacoes recentes</h3>
+                <h3>Notificações recentes</h3>
                 {notifications.length ? (
                     notifications.map((n, i) => (
                         <p className="mini-note" key={n.id || n.title}>
@@ -1409,7 +2136,7 @@ function ActivityCards({ sales = [], notifications = [] }) {
                         </p>
                     ))
                 ) : (
-                    <p className="muted-empty">Sem notificacoes ativas.</p>
+                    <p className="muted-empty">Sem notificações ativas.</p>
                 )}
             </section>
         </>
@@ -1938,7 +2665,7 @@ function Integrations() {
     return (
         <>
             <PageHeader
-                title="Integracoes"
+                title="Integrações"
                 subtitle="Ligue as suas fontes de dados ao OnBoarding."
             />
             <div className="integration-grid">
@@ -2061,17 +2788,22 @@ function Imports() {
         fd.append("file", file);
         try {
             const { data } = await api.post("/imports", fd);
-            const details = data.skipped ? ` ${data.skipped} linhas ignoradas: ${(data.errors || []).join(" ")}` : "";
+            const details = data.skipped
+                ? ` ${data.skipped} linhas ignoradas: ${(data.errors || []).join(" ")}`
+                : "";
             setMsg(`${data.created} registos importados.${details}`);
             setPreview([]);
             setFile(null);
         } catch (err) {
-            setMsg(err.response?.data?.message || "Nao foi possivel importar o CSV. Confirma o formato do ficheiro.");
+            setMsg(
+                err.response?.data?.message ||
+                    "Nao foi possivel importar o CSV. Confirma o formato do ficheiro.",
+            );
         }
     };
     return (
         <section className="card narrow">
-            <h1>Importacoes</h1>
+            <h1>Importações</h1>
             <form onSubmit={submit} className="form-grid">
                 <select
                     className="input"
@@ -2186,7 +2918,7 @@ function Notifications({ setBadge }) {
     return (
         <>
             <div className="page-title">
-                <h1>Notificacoes</h1>
+                <h1>Notificações</h1>
             </div>
             <div className="list-grid one">
                 {rows.map((n) => (
@@ -2350,15 +3082,15 @@ function SettingsPage() {
         ["permissions", Shield, "Permissoes"],
         ["billing", WalletCards, "Faturacao"],
         ["api", Plug, "API Keys"],
-        ["integrations", Database, "Integracoes"],
+        ["integrations", Database, "Integrações"],
         ["security", Settings, "Seguranca"],
-        ["notifications", Bell, "Notificacoes"],
+        ["notifications", Bell, "Notificações"],
     ];
     return (
         <>
             <div className="page-title">
                 <div>
-                    <h1>Definicoes</h1>
+                    <h1>Definições</h1>
                     <p>Gerir empresa, equipa e area de trabalho.</p>
                 </div>
             </div>
@@ -2612,9 +3344,9 @@ function SettingsPage() {
             )}
             {tab === "notifications" && (
                 <div className="settings-panel">
-                    <h3>Notificacoes</h3>
+                    <h3>Notificações</h3>
                     {Object.entries({
-                        email: "Notificacoes por email",
+                        email: "Notificações por email",
                         alerts: "Alertas criticos",
                         weekly: "Resumo semanal",
                     }).map(([key, label]) => (
